@@ -1,4 +1,4 @@
-# STL-3D-Visualization
+# STL-3D-Rasterer
 This software is designed to quickly visualize the binary STL files for CAD models for easy analysis without needing to open an actual CAD software. It is fundamentally designed as a supplement for CAD tools, allowing users to quickly display the STL structure without waiting for their CAD software to open or needing to overly burden their GPU.
 
 Currently, the software supports dragging, zooming, and rotating the visualization in 3D space. It also facilitates early identification for potential weak points in the design structure through its shading color gradient, which represents how complex and secure each section is in comparison with the rest of the structure.
