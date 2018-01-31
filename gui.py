@@ -5,77 +5,9 @@ from OpenGL.GLU import *
 
 from stlParser import parseTriangles
 
-# verticies = (
-#     (1, -1, -1),
-#     (1, 1, -1),
-#     (-1, 1, -1),
-#     (-1, -1, -1),
-#     (1, -1, 1),
-#     (1, 1, 1),
-#     (-1, -1, 1),
-#     (-1, 1, 1)
-#     )
-#
-# edges = (
-#     (0,1),
-#     (0,3),
-#     (0,4),
-#     (2,1),
-#     (2,3),
-#     (2,7),
-#     (6,3),
-#     (6,4),
-#     (6,7),
-#     (5,1),
-#     (5,4),
-#     (5,7)
-#     )
-#
-# colors = (
-#     (1,0,0),
-#     (0,1,0),
-#     (0,0,1),
-#     (0,1,0),
-#     (1,1,1),
-#     (0,1,1),
-#     (1,0,0),
-#     (0,1,0),
-#     (0,0,1),
-#     (1,0,0),
-#     (1,1,1),
-#     (0,1,1),
-#     )
-#
-# surfaces = (
-#     (0,1,2,3),
-#     (3,2,7,6),
-#     (6,7,5,4),
-#     (4,5,1,0),
-#     (1,5,7,2),
-#     (4,0,3,6)
-#     )
-#
-#
-# def Cube():
-#     glBegin(GL_QUADS)
-#     for surface in surfaces:
-#         x = 0
-#         for vertex in surface:
-#             x+=1
-#             glColor3fv(colors[x])
-#             glVertex3fv(verticies[vertex])
-#     glEnd()
-#
-#     glBegin(GL_LINES)
-#     for edge in edges:
-#         for vertex in edge:
-#             glVertex3fv(verticies[vertex])
-#     glEnd()
-
 def STLImage(triangles):
     glBegin(GL_TRIANGLES)
     glColor3fv((0.6, 0.3, 0.0)) #medium grey = 0.5, 0.5, 0.5
-    #print(len(triangles))
     for t in triangles:
         glVertex3fv(t)
     glEnd()
@@ -90,21 +22,24 @@ def STLImage(triangles):
 def main(inputFileName=r"examples\surface-mount-hinge-1.snapshot.9\1798A210_SURFACE-MOUNT HINGE.stl"):
     pygame.init()
     display = (800,600)
-    maxLength = 1500000 #largest number of triangles drawn to save on processing time
-    simplificationFactor = 1 #only draws every 5th triangle to save on processing power
 
     triangles, [maxX, maxY, maxZ] = parseTriangles(inputFileName)
-    #print len(triangles)
+    #the program slows down after about 750,000 triangles, so this code is designed to
+    #   keep the number of triangles (maxLength / simplificationFactor) around 500,000
+    #   (maxLength gets rounded to the nearest multiple of 500,000, and simplificationFactor
+    #   is designed to divide into maxLength to get 500,000)
+    maxLength = 500000 * max(round(len(triangles) / 500000), 1) #largest number of triangles drawn to save on processing time
+    simplificationFactor = max(int(len(triangles) / 500000), 1) #skips a few triangles to save on processing power
     triangles = triangles[0:maxLength:simplificationFactor]
     xLength = maxX * 1.5
     yLength = maxY * 1.5
     zLength = maxZ * 1.5
     pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
-    gluPerspective(60, (display[0]/display[1]), 0.1, -10 * max(xLength, yLength, zLength))
+    gluPerspective(60, (display[0]/display[1]), 0.1, -2 * max(xLength, yLength, zLength))
 
     glFrontFace(GL_CW)
 
-    glTranslatef(0.0,0.0, -10 * max(xLength, yLength, zLength))
+    glTranslatef(0.0,0.0, -2 * max(xLength, yLength, zLength))
     glTranslatef(-2.0, 0.4, 0)
     glRotatef(70, -2.5, -0.75, -1.25)
     xRotation = 0
@@ -149,6 +84,5 @@ def main(inputFileName=r"examples\surface-mount-hinge-1.snapshot.9\1798A210_SURF
         STLImage(triangles)
         pygame.display.flip()
         pygame.time.wait(10)
-
 
 main()
